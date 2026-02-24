@@ -1087,7 +1087,7 @@ document.querySelectorAll('[data-video]').forEach(wrapper => {
 const form = document.getElementById('applicationForm');
 const success = document.getElementById('formSuccess');
 
-form.addEventListener('submit', (e) => {
+form.addEventListener('submit', async (e) => {
   e.preventDefault();
   let valid = true;
 
@@ -1118,15 +1118,28 @@ form.addEventListener('submit', (e) => {
   const data = new FormData(form);
   const payload = Object.fromEntries(data.entries());
 
-  // Send data to endpoint
-  // <!-- ACTION URL -->
-  // fetch('ACTION_URL', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(payload)
-  // });
+  // Send data to Google Form
+  const GOOGLE_FORM_URL = 'https://docs.google.com/forms/d/17XX2UA0kC6rf_tL14OHOkp1SfqAqZQNtG5kdp9u3wG0/formResponse';
+  const formData = new URLSearchParams();
+  formData.append('entry.1151030732', payload.name || '');
+  formData.append('entry.737652136', payload.phone || '');
+  formData.append('entry.1551969298', payload.telegram || '');
+  formData.append('entry.628638480', payload.resume || '');
+  formData.append('entry.156196446', payload.best_deal || '');
+  formData.append('entry.327271963', payload.tender_plan || '');
+  formData.append('entry.124030586', payload.motivation || '');
 
-  console.log('Form data:', payload);
+  try {
+    await fetch(GOOGLE_FORM_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString()
+    });
+  } catch (e) {
+    // no-cors requests may appear as errors but data is sent
+    console.log('Form submitted (no-cors)');
+  }
 
   form.style.display = 'none';
   success.style.display = 'block';

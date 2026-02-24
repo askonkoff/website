@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Отклики — ТЕЙП РОП</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #151515;
+  --bg-card-hover: #1a1a1a;
+  --text: #f0f0f0;
+  --text-muted: #888;
+  --accent: #ff6b2b;
+  --accent-light: #ff8f5e;
+  --accent-glow: rgba(255, 107, 43, 0.15);
+  --gradient: linear-gradient(135deg, #ff6b2b, #ffb347);
+  --border: #222;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --green: #22c55e;
+  --yellow: #eab308;
+  --blue: #3b82f6;
+  --red: #ef4444;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Manrope', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ======================== AUTH SCREEN ======================== */
+.auth-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.auth-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 48px 40px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+}
+
+.auth-box .logo {
+  width: 48px;
+  height: auto;
+  margin-bottom: 24px;
+  opacity: 0.9;
+}
+
+.auth-box h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.auth-box p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+.auth-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+  margin-bottom: 16px;
+}
+
+.auth-input:focus {
+  border-color: var(--accent);
+}
+
+.auth-input.shake {
+  animation: shake 0.4s ease;
+  border-color: var(--red);
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--gradient);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.auth-btn:hover { opacity: 0.9; }
+
+.auth-error {
+  color: var(--red);
+  font-size: 0.85rem;
+  margin-top: 12px;
+  display: none;
+}
+
+/* ======================== DASHBOARD ======================== */
+.dashboard {
+  display: none;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px;
+}
+
+.dashboard.active {
+  display: block;
+}
+
+/* Header */
+.dash-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.dash-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.dash-header-left .logo {
+  width: 36px;
+  height: auto;
+  opacity: 0.9;
+}
+
+.dash-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.dash-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-sheets {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 0.3s;
+}
+
+.btn-sheets:hover { border-color: var(--accent); }
+
+.btn-logout {
+  padding: 10px 18px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.3s, color 0.3s;
+}
+
+.btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+/* Stats */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+}
+
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.stat-card .stat-label {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.stat-card.accent .stat-value { color: var(--accent); }
+.stat-card.green .stat-value { color: var(--green); }
+.stat-card.blue .stat-value { color: var(--blue); }
+.stat-card.yellow .stat-value { color: var(--yellow); }
+
+/* Filters */
+.filters-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+  padding: 12px 18px;
+  padding-left: 42px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.search-input:focus { border-color: var(--accent); }
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+}
+
+.search-wrap svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  width: 18px;
+  height: 18px;
+}
+
+.filter-btn {
+  padding: 10px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.filter-btn:hover { border-color: var(--text-muted); color: var(--text); }
+.filter-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+/* Table */
+.table-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.table-wrap table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-wrap th {
+  text-align: left;
+  padding: 14px 18px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table-wrap td {
+  padding: 14px 18px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #1a1a1a;
+  vertical-align: top;
+}
+
+.table-wrap tr:last-child td { border-bottom: none; }
+
+.table-wrap tbody tr {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.table-wrap tbody tr:hover { background: var(--bg-card-hover); }
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.status-badge.new { background: rgba(255, 107, 43, 0.15); color: var(--accent); }
+.status-badge.review { background: rgba(234, 179, 8, 0.15); color: var(--yellow); }
+.status-badge.interview { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+.status-badge.rejected { background: rgba(239, 68, 68, 0.1); color: var(--red); }
+.status-badge.hired { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+
+.tg-link {
+  color: var(--accent-light);
+  text-decoration: none;
+}
+.tg-link:hover { text-decoration: underline; }
+
+.date-cell {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+/* Detail modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  max-width: 700px;
+  width: 100%;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 32px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.modal-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+  transition: color 0.2s;
+}
+
+.modal-close:hover { color: var(--text); }
+
+.modal-contacts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.modal-contact {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+}
+
+.modal-contact .label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.modal-contact .value {
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.modal-contact .value a {
+  color: var(--accent-light);
+  text-decoration: none;
+}
+
+.modal-contact .value a:hover { text-decoration: underline; }
+
+.modal-question {
+  margin-bottom: 20px;
+}
+
+.modal-question .q-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.modal-question .q-answer {
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.modal-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+.modal-meta .meta-date {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-muted);
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 24px;
+  color: var(--text-muted);
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.btn-refresh {
+  padding: 10px 20px;
+  background: var(--gradient);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.btn-refresh:hover { opacity: 0.9; }
+
+/* Mobile cards */
+.mobile-cards {
+  display: none;
+}
+
+.mobile-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 18px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.mobile-card:hover { border-color: var(--accent); }
+
+.mobile-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.mobile-card-name {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.mobile-card-meta {
+  display: flex;
+  gap: 16px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.mobile-card-date {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+/* Config notice */
+.config-notice {
+  background: rgba(255, 107, 43, 0.1);
+  border: 1px solid rgba(255, 107, 43, 0.3);
+  border-radius: var(--radius-sm);
+  padding: 20px;
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.config-notice strong {
+  color: var(--accent);
+}
+
+.config-notice code {
+  background: var(--bg);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .table-wrap { display: none; }
+  .mobile-cards { display: block; }
+  .dash-header { flex-direction: column; align-items: flex-start; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .modal { padding: 24px; }
+  .modal-contacts { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======================== AUTH ======================== -->
+<div class="auth-screen" id="authScreen">
+  <div class="auth-box">
+    <img src="logo.png" alt="TAPE" class="logo">
+    <h1>Отклики на вакансию</h1>
+    <p>Введите пароль для доступа</p>
+    <input type="password" class="auth-input" id="authPassword" placeholder="Пароль" autocomplete="off">
+    <button class="auth-btn" id="authBtn">Войти</button>
+    <div class="auth-error" id="authError">Неверный пароль</div>
+  </div>
+</div>
+
+<!-- ======================== DASHBOARD ======================== -->
+<div class="dashboard" id="dashboard">
+
+  <!-- Header -->
+  <div class="dash-header">
+    <div class="dash-header-left">
+      <img src="logo.png" alt="TAPE" class="logo">
+      <h1>Отклики — РОП</h1>
+    </div>
+    <div class="dash-header-right">
+      <a href="#" class="btn-sheets" id="sheetsLink" target="_blank">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+        Google Sheets
+      </a>
+      <button class="btn-refresh" id="refreshBtn">
+        Обновить
+      </button>
+      <button class="btn-logout" id="logoutBtn">Выйти</button>
+    </div>
+  </div>
+
+  <!-- Config notice (shown when SHEET_ID not set) -->
+  <div class="config-notice" id="configNotice" style="display:none;">
+    <strong>Настройка не завершена.</strong> Замените <code>SHEET_ID</code> и <code>APPS_SCRIPT_URL</code> в коде admin.html и index.html на реальные значения из Google Sheets / Apps Script.
+  </div>
+
+  <!-- Stats -->
+  <div class="stats-row" id="statsRow">
+    <div class="stat-card accent">
+      <div class="stat-value" id="statTotal">—</div>
+      <div class="stat-label">Всего откликов</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-value" id="statNew">—</div>
+      <div class="stat-label">Новые</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-value" id="statReview">—</div>
+      <div class="stat-label">На рассмотрении</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="stat-value" id="statInterview">—</div>
+      <div class="stat-label">Собеседование</div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row">
+    <div class="search-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" class="search-input" id="searchInput" placeholder="Поиск по имени, телефону, telegram...">
+    </div>
+    <button class="filter-btn active" data-status="all">Все</button>
+    <button class="filter-btn" data-status="Новый">Новые</button>
+    <button class="filter-btn" data-status="На рассмотрении">На рассмотрении</button>
+    <button class="filter-btn" data-status="Собеседование">Собеседование</button>
+    <button class="filter-btn" data-status="Отказ">Отказ</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="loading-spinner"></div>
+    <div>Загрузка откликов...</div>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" id="emptyState" style="display:none;">
+    <div class="empty-icon">📭</div>
+    <div>Откликов пока нет</div>
+  </div>
+
+  <!-- Table (desktop) -->
+  <div class="table-wrap" id="tableWrap" style="display:none;">
+    <table>
+      <thead>
+        <tr>
+          <th>Дата</th>
+          <th>Имя</th>
+          <th>Телефон</th>
+          <th>Telegram</th>
+          <th>Статус</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Mobile cards -->
+  <div class="mobile-cards" id="mobileCards"></div>
+
+</div>
+
+<!-- ======================== DETAIL MODAL ======================== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <h2 id="modalName"></h2>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-contacts" id="modalContacts"></div>
+    <div id="modalQuestions"></div>
+    <div class="modal-meta">
+      <div class="meta-date" id="modalDate"></div>
+      <div id="modalStatus"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======================== CONFIG ======================== */
+const SHEET_ID = '1Yo-hnKTuQCl2sOuPYD8a9C3cNB2FBv0J2DAGGaJCOKk';
+const SHEET_GID = '1835890803'; // Google Form responses sheet
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}`;
+const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
+const PASSWORD = 'tape2024';
+// Column name mapping (Google Form headers → dashboard keys)
+const COL_MAP = {
+  'Отметка времени': 'Дата',
+  'Ссылка на резюме': 'Резюме'
+};
+
+/* ======================== AUTH ======================== */
+const authScreen = document.getElementById('authScreen');
+const dashboard = document.getElementById('dashboard');
+const authPassword = document.getElementById('authPassword');
+const authBtn = document.getElementById('authBtn');
+const authError = document.getElementById('authError');
+
+function checkAuth() {
+  if (sessionStorage.getItem('tape_admin_auth') === 'true') {
+    authScreen.style.display = 'none';
+    dashboard.classList.add('active');
+    loadData();
+  }
+}
+
+function login() {
+  if (authPassword.value === PASSWORD) {
+    sessionStorage.setItem('tape_admin_auth', 'true');
+    authScreen.style.display = 'none';
+    dashboard.classList.add('active');
+    authError.style.display = 'none';
+    loadData();
+  } else {
+    authError.style.display = 'block';
+    authPassword.classList.add('shake');
+    setTimeout(() => authPassword.classList.remove('shake'), 400);
+  }
+}
+
+authBtn.addEventListener('click', login);
+authPassword.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') login();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', () => {
+  sessionStorage.removeItem('tape_admin_auth');
+  location.reload();
+});
+
+/* ======================== DATA ======================== */
+let allApplications = [];
+let currentFilter = 'all';
+
+function parseGoogleSheetsJSON(text) {
+  // Google Sheets returns JSONP-like format: google.visualization.Query.setResponse({...})
+  const match = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]+)\);?/);
+  if (!match) return [];
+
+  const json = JSON.parse(match[1]);
+  const cols = json.table.cols.map(c => c.label);
+  const rows = json.table.rows || [];
+
+  return rows.map(row => {
+    const obj = {};
+    row.c.forEach((cell, i) => {
+      if (cols[i]) {
+        // Apply column name mapping
+        const key = COL_MAP[cols[i]] || cols[i];
+        if (cell && cell.v !== null && cell.v !== undefined) {
+          // Handle date type
+          if (cell.f) {
+            obj[key] = cell.f; // Use formatted value
+          } else {
+            obj[key] = cell.v;
+          }
+        } else {
+          obj[key] = '';
+        }
+      }
+    });
+    // Add default status if not present
+    if (!obj['Статус']) obj['Статус'] = 'Новый';
+    return obj;
+  });
+}
+
+async function loadData() {
+  const loading = document.getElementById('loading');
+  const emptyState = document.getElementById('emptyState');
+  const tableWrap = document.getElementById('tableWrap');
+  const configNotice = document.getElementById('configNotice');
+
+  loading.style.display = 'block';
+  emptyState.style.display = 'none';
+  tableWrap.style.display = 'none';
+
+  configNotice.style.display = 'none';
+
+  try {
+    const resp = await fetch(DATA_URL);
+    const text = await resp.text();
+    allApplications = parseGoogleSheetsJSON(text);
+    // Reverse so newest first
+    allApplications.reverse();
+  } catch (err) {
+    console.error('Failed to load data:', err);
+    allApplications = [];
+  }
+
+  loading.style.display = 'none';
+  renderAll();
+}
+
+function getDemoData() {
+  return [
+    {
+      'Дата': '24.02.2026 14:30',
+      'Имя': 'Иван Петров',
+      'Телефон': '+7 (999) 123-45-67',
+      'Telegram': '@ivan_petrov',
+      'Резюме': 'https://hh.ru/resume/123',
+      'Лучшая сделка': 'Закрыл контракт с Яндексом на 15 млн за серию роликов для Яндекс.Маркета. Вышел на них через знакомого продюсера, который работал с их агентством. Провёл 4 встречи за 2 недели, сделал индивидуальный pitch deck.',
+      'План по тендерам': 'Составил бы список топ-50 агентств, нашёл контакты ЛПР через LinkedIn и Telegram-чаты продакшенов. Первые 2 недели — cold outreach с кейсами. Параллельно мониторю тендерные площадки. На 3-4 неделе — личные встречи с теми, кто ответил.',
+      'Мотивация': 'Давно слежу за ТЕЙП, нравится подход к контенту.',
+      'Статус': 'Новый'
+    },
+    {
+      'Дата': '23.02.2026 11:15',
+      'Имя': 'Мария Сидорова',
+      'Телефон': '+7 (916) 555-88-99',
+      'Telegram': '@m_sidorova',
+      'Резюме': '',
+      'Лучшая сделка': 'Привела клиента из фарм-индустрии — годовой контракт на 8 млн. Нашла через отраслевую конференцию, где выступала с докладом. Чек первой сделки был 2 млн, потом расширили до годового контракта.',
+      'План по тендерам': 'Начала бы с анализа текущих тендеров на площадках типа B2B-Center. Параллельно — networking на профильных мероприятиях. Подготовила бы шоурил под каждый сегмент. За 30 дней реально войти в 3-5 пулов.',
+      'Мотивация': '',
+      'Статус': 'На рассмотрении'
+    },
+    {
+      'Дата': '22.02.2026 09:00',
+      'Имя': 'Алексей Козлов',
+      'Телефон': '+7 (905) 777-33-11',
+      'Telegram': '@kozlov_sales',
+      'Резюме': 'https://drive.google.com/file/resume',
+      'Лучшая сделка': 'Заключил договор с крупным ритейлером на производство рекламных роликов для 12 магазинов. Общий чек — 22 млн. Вышел через CEO их digital-агентства на конференции.',
+      'План по тендерам': 'Шаг 1: Аудит текущей базы ТЕЙП и поиск warm leads. Шаг 2: Подготовка коммерческих предложений под разные сегменты. Шаг 3: Системный outreach — 10 контактов в день. Шаг 4: Follow-up и личные встречи.',
+      'Мотивация': 'Хочу строить продажи в продакшене, а не просто закрывать разовые сделки.',
+      'Статус': 'Собеседование'
+    }
+  ];
+}
+
+/* ======================== RENDER ======================== */
+function renderAll() {
+  const filtered = getFilteredData();
+  renderStats();
+  renderTable(filtered);
+  renderMobileCards(filtered);
+
+  const tableWrap = document.getElementById('tableWrap');
+  const emptyState = document.getElementById('emptyState');
+  const mobileCards = document.getElementById('mobileCards');
+
+  if (filtered.length === 0) {
+    tableWrap.style.display = 'none';
+    mobileCards.innerHTML = '';
+    emptyState.style.display = 'block';
+  } else {
+    tableWrap.style.display = '';
+    emptyState.style.display = 'none';
+  }
+}
+
+function getFilteredData() {
+  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  return allApplications.filter(app => {
+    // Status filter
+    if (currentFilter !== 'all' && (app['Статус'] || 'Новый') !== currentFilter) return false;
+    // Search
+    if (search) {
+      const haystack = [app['Имя'], app['Телефон'], app['Telegram']].join(' ').toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
+    return true;
+  });
+}
+
+function renderStats() {
+  const total = allApplications.length;
+  const newCount = allApplications.filter(a => (a['Статус'] || 'Новый') === 'Новый').length;
+  const reviewCount = allApplications.filter(a => a['Статус'] === 'На рассмотрении').length;
+  const interviewCount = allApplications.filter(a => a['Статус'] === 'Собеседование').length;
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statNew').textContent = newCount;
+  document.getElementById('statReview').textContent = reviewCount;
+  document.getElementById('statInterview').textContent = interviewCount;
+}
+
+function getStatusClass(status) {
+  const map = {
+    'Новый': 'new',
+    'На рассмотрении': 'review',
+    'Собеседование': 'interview',
+    'Отказ': 'rejected',
+    'Принят': 'hired'
+  };
+  return map[status] || 'new';
+}
+
+function renderTable(data) {
+  const tbody = document.getElementById('tableBody');
+  tbody.innerHTML = data.map((app, i) => {
+    const status = app['Статус'] || 'Новый';
+    const tg = app['Telegram'] || '';
+    const tgClean = tg.replace('@', '');
+    return `<tr data-index="${i}" onclick="openModal(${allApplications.indexOf(app)})">
+      <td class="date-cell">${app['Дата'] || '—'}</td>
+      <td><strong>${app['Имя'] || '—'}</strong></td>
+      <td>${app['Телефон'] || '—'}</td>
+      <td>${tg ? `<a href="https://t.me/${tgClean}" class="tg-link" onclick="event.stopPropagation()" target="_blank">${tg}</a>` : '—'}</td>
+      <td><span class="status-badge ${getStatusClass(status)}">${status}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function renderMobileCards(data) {
+  const container = document.getElementById('mobileCards');
+  container.innerHTML = data.map((app, i) => {
+    const status = app['Статус'] || 'Новый';
+    const tg = app['Telegram'] || '';
+    return `<div class="mobile-card" onclick="openModal(${allApplications.indexOf(app)})">
+      <div class="mobile-card-header">
+        <div class="mobile-card-name">${app['Имя'] || '—'}</div>
+        <span class="status-badge ${getStatusClass(status)}">${status}</span>
+      </div>
+      <div class="mobile-card-meta">
+        <span>${app['Телефон'] || ''}</span>
+        <span>${tg}</span>
+      </div>
+      <div class="mobile-card-date">${app['Дата'] || ''}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ======================== MODAL ======================== */
+function openModal(index) {
+  const app = allApplications[index];
+  if (!app) return;
+
+  document.getElementById('modalName').textContent = app['Имя'] || 'Без имени';
+
+  // Contacts
+  const contacts = document.getElementById('modalContacts');
+  const tg = app['Telegram'] || '';
+  const tgClean = tg.replace('@', '');
+  let contactsHTML = `
+    <div class="modal-contact">
+      <div class="label">Телефон</div>
+      <div class="value"><a href="tel:${(app['Телефон'] || '').replace(/[^\d+]/g, '')}">${app['Телефон'] || '—'}</a></div>
+    </div>
+    <div class="modal-contact">
+      <div class="label">Telegram</div>
+      <div class="value">${tg ? `<a href="https://t.me/${tgClean}" target="_blank">${tg}</a>` : '—'}</div>
+    </div>`;
+  if (app['Резюме']) {
+    contactsHTML += `
+    <div class="modal-contact">
+      <div class="label">Резюме</div>
+      <div class="value"><a href="${app['Резюме']}" target="_blank">Открыть ↗</a></div>
+    </div>`;
+  }
+  contacts.innerHTML = contactsHTML;
+
+  // Questions
+  const questions = document.getElementById('modalQuestions');
+  let qHTML = '';
+
+  if (app['Лучшая сделка']) {
+    qHTML += `<div class="modal-question">
+      <div class="q-label">Лучшая сделка</div>
+      <div class="q-answer">${escapeHtml(app['Лучшая сделка'])}</div>
+    </div>`;
+  }
+  if (app['План по тендерам']) {
+    qHTML += `<div class="modal-question">
+      <div class="q-label">План по тендерам за 30 дней</div>
+      <div class="q-answer">${escapeHtml(app['План по тендерам'])}</div>
+    </div>`;
+  }
+  if (app['Мотивация']) {
+    qHTML += `<div class="modal-question">
+      <div class="q-label">Почему откликается</div>
+      <div class="q-answer">${escapeHtml(app['Мотивация'])}</div>
+    </div>`;
+  }
+  questions.innerHTML = qHTML;
+
+  // Meta
+  document.getElementById('modalDate').textContent = app['Дата'] || '';
+  const status = app['Статус'] || 'Новый';
+  document.getElementById('modalStatus').innerHTML = `<span class="status-badge ${getStatusClass(status)}">${status}</span>`;
+
+  document.getElementById('modalOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalOverlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeModal();
+});
+
+/* ======================== FILTERS ======================== */
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.status;
+    renderAll();
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', renderAll);
+
+/* ======================== SHEETS LINK ======================== */
+document.getElementById('sheetsLink').href = SHEET_URL;
+
+/* ======================== REFRESH ======================== */
+document.getElementById('refreshBtn').addEventListener('click', loadData);
+
+/* ======================== INIT ======================== */
+checkAuth();
+</script>
+
+</body>
+</html>
