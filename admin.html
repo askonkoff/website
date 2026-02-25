@@ -475,8 +475,8 @@ body {
 
 .modal-meta {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 12px;
   padding-top: 16px;
   border-top: 1px solid var(--border);
   margin-top: 8px;
@@ -485,6 +485,54 @@ body {
 .modal-meta .meta-date {
   color: var(--text-muted);
   font-size: 0.85rem;
+}
+
+/* Status selector */
+.status-selector {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.status-selector .status-option {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  opacity: 0.4;
+  user-select: none;
+}
+
+.status-selector .status-option:hover {
+  opacity: 0.7;
+}
+
+.status-selector .status-option.active {
+  opacity: 1;
+  border-color: currentColor;
+}
+
+.status-option.new { background: rgba(255, 107, 43, 0.15); color: var(--accent); }
+.status-option.review { background: rgba(234, 179, 8, 0.15); color: var(--yellow); }
+.status-option.interview { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+.status-option.rejected { background: rgba(239, 68, 68, 0.1); color: var(--red); }
+.status-option.hired { background: rgba(34, 197, 94, 0.15); color: var(--green); }
+
+.status-change-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+.modal-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* Loading */
@@ -723,8 +771,19 @@ body {
     <div class="modal-contacts" id="modalContacts"></div>
     <div id="modalQuestions"></div>
     <div class="modal-meta">
-      <div class="meta-date" id="modalDate"></div>
-      <div id="modalStatus"></div>
+      <div class="modal-meta-row">
+        <div class="meta-date" id="modalDate"></div>
+      </div>
+      <div>
+        <div class="status-change-label">Статус</div>
+        <div class="status-selector" id="statusSelector">
+          <span class="status-option new" data-status="Новый">Новый</span>
+          <span class="status-option review" data-status="На рассмотрении">На рассмотрении</span>
+          <span class="status-option interview" data-status="Собеседование">Собеседование</span>
+          <span class="status-option rejected" data-status="Отказ">Отказ</span>
+          <span class="status-option hired" data-status="Принят">Принят</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -741,6 +800,37 @@ const COL_MAP = {
   'Отметка времени': 'Дата',
   'Ссылка на резюме': 'Резюме'
 };
+
+/* ======================== STATUS PERSISTENCE (localStorage) ======================== */
+const STATUS_STORAGE_KEY = 'tape_rop_statuses';
+
+function getAppKey(app) {
+  // Unique key from date + name + phone
+  return btoa(encodeURIComponent((app['Дата'] || '') + '|' + (app['Имя'] || '') + '|' + (app['Телефон'] || '')));
+}
+
+function getAllStatusOverrides() {
+  try {
+    return JSON.parse(localStorage.getItem(STATUS_STORAGE_KEY) || '{}');
+  } catch { return {}; }
+}
+
+function getAppStatus(app) {
+  const overrides = getAllStatusOverrides();
+  const key = getAppKey(app);
+  return overrides[key] || app['Статус'] || 'Новый';
+}
+
+function setAppStatus(app, newStatus) {
+  const overrides = getAllStatusOverrides();
+  const key = getAppKey(app);
+  overrides[key] = newStatus;
+  localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(overrides));
+  // Also update in-memory
+  app['Статус'] = newStatus;
+}
+
+let currentModalIndex = -1;
 
 /* ======================== AUTH ======================== */
 const authScreen = document.getElementById('authScreen');
@@ -814,6 +904,10 @@ function parseGoogleSheetsJSON(text) {
     });
     // Add default status if not present
     if (!obj['Статус']) obj['Статус'] = 'Новый';
+    // Apply localStorage status override
+    const overrides = getAllStatusOverrides();
+    const key = getAppKey(obj);
+    if (overrides[key]) obj['Статус'] = overrides[key];
     return obj;
   });
 }
@@ -1031,8 +1125,13 @@ function openModal(index) {
 
   // Meta
   document.getElementById('modalDate').textContent = app['Дата'] || '';
+
+  // Status selector
+  currentModalIndex = index;
   const status = app['Статус'] || 'Новый';
-  document.getElementById('modalStatus').innerHTML = `<span class="status-badge ${getStatusClass(status)}">${status}</span>`;
+  document.querySelectorAll('#statusSelector .status-option').forEach(opt => {
+    opt.classList.toggle('active', opt.dataset.status === status);
+  });
 
   document.getElementById('modalOverlay').classList.add('active');
   document.body.style.overflow = 'hidden';
@@ -1055,6 +1154,24 @@ document.getElementById('modalOverlay').addEventListener('click', (e) => {
 });
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeModal();
+});
+
+/* ======================== STATUS CHANGE ======================== */
+document.querySelectorAll('#statusSelector .status-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    if (currentModalIndex < 0) return;
+    const app = allApplications[currentModalIndex];
+    if (!app) return;
+    const newStatus = opt.dataset.status;
+    // Save status
+    setAppStatus(app, newStatus);
+    // Update selector UI
+    document.querySelectorAll('#statusSelector .status-option').forEach(o => {
+      o.classList.toggle('active', o.dataset.status === newStatus);
+    });
+    // Re-render table, cards and stats
+    renderAll();
+  });
 });
 
 /* ======================== FILTERS ======================== */
