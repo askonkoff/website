@@ -1174,8 +1174,8 @@ form.querySelectorAll('input, textarea').forEach(field => {
 
 /* ======================== VISIT TRACKING ======================== */
 (function() {
-  var VISIT_API = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
-  if (!VISIT_API || VISIT_API === 'YOUR_APPS_SCRIPT_WEB_APP_URL') return;
+  var VISIT_API = 'https://script.google.com/macros/s/AKfycbzVEa6JfwVEvo35EbXoAGI2wT8Q-kwAhqhQz2VOWcO-seu754hRJNXI1duUzvQmKF_y/exec';
+  if (!VISIT_API || VISIT_API === 'https://script.google.com/macros/s/AKfycbzVEa6JfwVEvo35EbXoAGI2wT8Q-kwAhqhQz2VOWcO-seu754hRJNXI1duUzvQmKF_y/exec') return;
   if (sessionStorage.getItem('tape_visit_counted')) return;
 
   var params = new URLSearchParams({
