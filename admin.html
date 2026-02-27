@@ -819,7 +819,7 @@ const SHEET_GID = '1835890803'; // Google Form responses sheet
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}`;
 const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
 const PASSWORD = 'tape2024';
-const VISIT_API = 'https://script.google.com/macros/s/AKfycbzVEa6JfwVEvo35EbXoAGI2wT8Q-kwAhqhQz2VOWcO-seu754hRJNXI1duUzvQmKF_y/exec';
+const VISIT_API = 'https://script.google.com/macros/s/AKfycbyxyMKObsNQr_xUf-4UYYfqHflYtXo1J9IFwXor5cvm7iIiIIOnWuuhwD6Ljex3CnuH/exec';
 // Column name mapping (Google Form headers → dashboard keys)
 const COL_MAP = {
   'Отметка времени': 'Дата',
@@ -967,7 +967,7 @@ async function loadData() {
 
 /* ======================== VISIT STATS ======================== */
 async function loadVisitStats() {
-  if (!VISIT_API || VISIT_API === 'https://script.google.com/macros/s/AKfycbzVEa6JfwVEvo35EbXoAGI2wT8Q-kwAhqhQz2VOWcO-seu754hRJNXI1duUzvQmKF_y/exec') return;
+  if (!VISIT_API) return;
 
   try {
     const resp = await fetch(VISIT_API);
