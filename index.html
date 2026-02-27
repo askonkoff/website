@@ -1174,12 +1174,10 @@ form.querySelectorAll('input, textarea').forEach(field => {
 
 /* ======================== VISIT TRACKING ======================== */
 (function() {
-  var VISIT_API = 'https://script.google.com/macros/s/AKfycbzAARrlC1wzyGRY7wt1jqq7vXFjpwsuUGAOSXjXAZo-1qydU3PQ6cebIVamk5yaJ_Hg/exec';
-  if (!VISIT_API) return;
   if (sessionStorage.getItem('tape_visit_counted')) return;
 
   try {
-    new Image().src = VISIT_API + '?action=visit';
+    new Image().src = '/api/visit?t=' + Date.now();
   } catch(e) {}
 
   sessionStorage.setItem('tape_visit_counted', '1');
