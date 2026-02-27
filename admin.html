@@ -695,7 +695,31 @@ body {
     <strong>Настройка не завершена.</strong> Замените <code>SHEET_ID</code> и <code>APPS_SCRIPT_URL</code> в коде admin.html и index.html на реальные значения из Google Sheets / Apps Script.
   </div>
 
-  <!-- Stats -->
+  <!-- Visit Stats -->
+  <div id="visitStatsBlock" style="display:none;">
+    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 8px;">Посещения</div>
+    <div class="stats-row" id="visitStatsRow">
+      <div class="stat-card accent">
+        <div class="stat-value" id="visitTotal">—</div>
+        <div class="stat-label">Всего визитов</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-value" id="visitToday" style="color: var(--green);">—</div>
+        <div class="stat-label">Сегодня</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-value" id="visitWeek" style="color: var(--blue);">—</div>
+        <div class="stat-label">За 7 дней</div>
+      </div>
+      <div class="stat-card yellow">
+        <div class="stat-value" id="visitConversion" style="color: var(--yellow);">—</div>
+        <div class="stat-label">Конверсия</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Stats -->
+  <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 8px;">Отклики</div>
   <div class="stats-row" id="statsRow">
     <div class="stat-card accent">
       <div class="stat-value" id="statTotal">—</div>
@@ -795,6 +819,7 @@ const SHEET_GID = '1835890803'; // Google Form responses sheet
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}`;
 const DATA_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&gid=${SHEET_GID}`;
 const PASSWORD = 'tape2024';
+const VISIT_API = 'YOUR_APPS_SCRIPT_WEB_APP_URL';
 // Column name mapping (Google Form headers → dashboard keys)
 const COL_MAP = {
   'Отметка времени': 'Дата',
@@ -937,6 +962,32 @@ async function loadData() {
 
   loading.style.display = 'none';
   renderAll();
+  loadVisitStats();
+}
+
+/* ======================== VISIT STATS ======================== */
+async function loadVisitStats() {
+  if (!VISIT_API || VISIT_API === 'YOUR_APPS_SCRIPT_WEB_APP_URL') return;
+
+  try {
+    const resp = await fetch(VISIT_API);
+    const stats = await resp.json();
+
+    document.getElementById('visitStatsBlock').style.display = '';
+    document.getElementById('visitTotal').textContent = stats.total || 0;
+    document.getElementById('visitToday').textContent = stats.today || 0;
+    document.getElementById('visitWeek').textContent = stats.week || 0;
+
+    const totalVisits = stats.total || 0;
+    const totalApps = allApplications.length;
+    if (totalVisits > 0) {
+      document.getElementById('visitConversion').textContent = ((totalApps / totalVisits) * 100).toFixed(1) + '%';
+    } else {
+      document.getElementById('visitConversion').textContent = '—';
+    }
+  } catch (err) {
+    console.error('Failed to load visit stats:', err);
+  }
 }
 
 function getDemoData() {
