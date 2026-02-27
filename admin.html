@@ -697,7 +697,10 @@ body {
 
   <!-- Visit Stats -->
   <div id="visitStatsBlock" style="display:none;">
-    <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 8px;">Посещения</div>
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+      <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700;">Посещения</div>
+      <div id="visitConversionBadge" style="display: none; font-size: 0.7rem; font-weight: 700; color: var(--yellow); background: rgba(234, 179, 8, 0.12); padding: 2px 10px; border-radius: 12px; letter-spacing: 0.02em;">конверсия <span id="visitConversion">—</span></div>
+    </div>
     <div class="stats-row" id="visitStatsRow">
       <div class="stat-card accent">
         <div class="stat-value" id="visitTotal">—</div>
@@ -710,10 +713,6 @@ body {
       <div class="stat-card blue">
         <div class="stat-value" id="visitWeek" style="color: var(--blue);">—</div>
         <div class="stat-label">За 7 дней</div>
-      </div>
-      <div class="stat-card yellow">
-        <div class="stat-value" id="visitConversion" style="color: var(--yellow);">—</div>
-        <div class="stat-label">Конверсия</div>
       </div>
     </div>
   </div>
@@ -982,6 +981,7 @@ async function loadVisitStats() {
     const totalApps = allApplications.length;
     if (totalVisits > 0) {
       document.getElementById('visitConversion').textContent = ((totalApps / totalVisits) * 100).toFixed(1) + '%';
+      document.getElementById('visitConversionBadge').style.display = '';
     } else {
       document.getElementById('visitConversion').textContent = '—';
     }
