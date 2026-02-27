@@ -1174,19 +1174,12 @@ form.querySelectorAll('input, textarea').forEach(field => {
 
 /* ======================== VISIT TRACKING ======================== */
 (function() {
-  var VISIT_API = 'https://script.google.com/macros/s/AKfycbzVEa6JfwVEvo35EbXoAGI2wT8Q-kwAhqhQz2VOWcO-seu754hRJNXI1duUzvQmKF_y/exec';
+  var VISIT_API = 'https://script.google.com/macros/s/AKfycbzAARrlC1wzyGRY7wt1jqq7vXFjpwsuUGAOSXjXAZo-1qydU3PQ6cebIVamk5yaJ_Hg/exec';
   if (!VISIT_API) return;
   if (sessionStorage.getItem('tape_visit_counted')) return;
 
-  var params = new URLSearchParams({
-    action: 'visit',
-    sid: Math.random().toString(36).substring(2, 12),
-    ua: navigator.userAgent.substring(0, 200),
-    ref: document.referrer.substring(0, 500)
-  });
-
   try {
-    new Image().src = VISIT_API + '?' + params.toString();
+    new Image().src = VISIT_API + '?action=visit';
   } catch(e) {}
 
   sessionStorage.setItem('tape_visit_counted', '1');
