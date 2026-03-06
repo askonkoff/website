@@ -32,6 +32,7 @@
   --yellow: #eab308;
   --blue: #3b82f6;
   --red: #ef4444;
+  --purple: #a855f7;
 }
 
 html { scroll-behavior: smooth; }
@@ -242,6 +243,7 @@ body {
 .stat-card.green .stat-value { color: var(--green); }
 .stat-card.blue .stat-value { color: var(--blue); }
 .stat-card.yellow .stat-value { color: var(--yellow); }
+.stat-card.purple .stat-value { color: var(--purple); }
 
 /* Filters */
 .filters-row {
@@ -354,6 +356,7 @@ body {
 .status-badge.new { background: rgba(255, 107, 43, 0.15); color: var(--accent); }
 .status-badge.review { background: rgba(234, 179, 8, 0.15); color: var(--yellow); }
 .status-badge.interview { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+.status-badge.screening { background: rgba(168, 85, 247, 0.15); color: var(--purple); }
 .status-badge.rejected { background: rgba(239, 68, 68, 0.1); color: var(--red); }
 .status-badge.hired { background: rgba(34, 197, 94, 0.15); color: var(--green); }
 
@@ -518,6 +521,7 @@ body {
 .status-option.new { background: rgba(255, 107, 43, 0.15); color: var(--accent); }
 .status-option.review { background: rgba(234, 179, 8, 0.15); color: var(--yellow); }
 .status-option.interview { background: rgba(59, 130, 246, 0.15); color: var(--blue); }
+.status-option.screening { background: rgba(168, 85, 247, 0.15); color: var(--purple); }
 .status-option.rejected { background: rgba(239, 68, 68, 0.1); color: var(--red); }
 .status-option.hired { background: rgba(34, 197, 94, 0.15); color: var(--green); }
 
@@ -534,6 +538,83 @@ body {
   align-items: center;
   justify-content: space-between;
 }
+
+.modal-section {
+  margin-bottom: 20px;
+}
+
+.modal-section-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 8px;
+  font-weight: 700;
+}
+
+.modal-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.modal-input:focus { border-color: var(--accent); }
+
+.modal-textarea {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-textarea:focus { border-color: var(--accent); }
+
+.modal-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.modal-input-row .modal-input { flex: 1; }
+
+.modal-link-btn {
+  padding: 10px 14px;
+  background: var(--accent-glow);
+  color: var(--accent);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.modal-link-btn:hover { opacity: 0.8; }
+
+.modal-saved-hint {
+  font-size: 0.75rem;
+  color: var(--green);
+  opacity: 0;
+  transition: opacity 0.3s;
+  margin-top: 4px;
+}
+
+.modal-saved-hint.visible { opacity: 1; }
 
 /* Loading */
 .loading {
@@ -716,6 +797,10 @@ body {
       <div class="stat-value" id="statNew">—</div>
       <div class="stat-label">Новые</div>
     </div>
+    <div class="stat-card purple">
+      <div class="stat-value" id="statScreening">—</div>
+      <div class="stat-label">Скрининг</div>
+    </div>
     <div class="stat-card yellow">
       <div class="stat-value" id="statReview">—</div>
       <div class="stat-label">На рассмотрении</div>
@@ -734,6 +819,7 @@ body {
     </div>
     <button class="filter-btn active" data-status="all">Все</button>
     <button class="filter-btn" data-status="Новый">Новые</button>
+    <button class="filter-btn" data-status="Скрининг">Скрининг</button>
     <button class="filter-btn" data-status="На рассмотрении">На рассмотрении</button>
     <button class="filter-btn" data-status="Собеседование">Собеседование</button>
     <button class="filter-btn" data-status="Отказ">Отказ</button>
@@ -781,6 +867,19 @@ body {
     </div>
     <div class="modal-contacts" id="modalContacts"></div>
     <div id="modalQuestions"></div>
+    <div class="modal-section">
+      <div class="modal-section-label">Ссылка на интервью</div>
+      <div class="modal-input-row">
+        <input type="url" id="modalInterviewLink" class="modal-input" placeholder="Zoom / Google Meet / Телемост...">
+        <a id="modalInterviewOpen" href="#" target="_blank" class="modal-link-btn" style="display:none;">Открыть ↗</a>
+      </div>
+      <div class="modal-saved-hint" id="interviewSavedHint">Сохранено</div>
+    </div>
+    <div class="modal-section">
+      <div class="modal-section-label">Комментарий</div>
+      <textarea id="modalComment" class="modal-textarea" placeholder="Заметки о кандидате..." rows="3"></textarea>
+      <div class="modal-saved-hint" id="commentSavedHint">Сохранено</div>
+    </div>
     <div class="modal-meta">
       <div class="modal-meta-row">
         <div class="meta-date" id="modalDate"></div>
@@ -789,6 +888,7 @@ body {
         <div class="status-change-label">Статус</div>
         <div class="status-selector" id="statusSelector">
           <span class="status-option new" data-status="Новый">Новый</span>
+          <span class="status-option screening" data-status="Скрининг">Скрининг</span>
           <span class="status-option review" data-status="На рассмотрении">На рассмотрении</span>
           <span class="status-option interview" data-status="Собеседование">Собеседование</span>
           <span class="status-option rejected" data-status="Отказ">Отказ</span>
@@ -840,6 +940,29 @@ function setAppStatus(app, newStatus) {
   localStorage.setItem(STATUS_STORAGE_KEY, JSON.stringify(overrides));
   // Also update in-memory
   app['Статус'] = newStatus;
+}
+
+/* ======================== EXTRAS PERSISTENCE (interview link, comments) ======================== */
+const EXTRAS_STORAGE_KEY = 'tape_rop_extras';
+
+function getAllExtras() {
+  try {
+    return JSON.parse(localStorage.getItem(EXTRAS_STORAGE_KEY) || '{}');
+  } catch { return {}; }
+}
+
+function getAppExtras(app) {
+  const all = getAllExtras();
+  const key = getAppKey(app);
+  return all[key] || {};
+}
+
+function setAppExtra(app, field, value) {
+  const all = getAllExtras();
+  const key = getAppKey(app);
+  if (!all[key]) all[key] = {};
+  all[key][field] = value;
+  localStorage.setItem(EXTRAS_STORAGE_KEY, JSON.stringify(all));
 }
 
 let currentModalIndex = -1;
@@ -1065,11 +1188,13 @@ function getFilteredData() {
 function renderStats() {
   const total = allApplications.length;
   const newCount = allApplications.filter(a => (a['Статус'] || 'Новый') === 'Новый').length;
+  const screeningCount = allApplications.filter(a => a['Статус'] === 'Скрининг').length;
   const reviewCount = allApplications.filter(a => a['Статус'] === 'На рассмотрении').length;
   const interviewCount = allApplications.filter(a => a['Статус'] === 'Собеседование').length;
 
   document.getElementById('statTotal').textContent = total;
   document.getElementById('statNew').textContent = newCount;
+  document.getElementById('statScreening').textContent = screeningCount;
   document.getElementById('statReview').textContent = reviewCount;
   document.getElementById('statInterview').textContent = interviewCount;
 }
@@ -1077,6 +1202,7 @@ function renderStats() {
 function getStatusClass(status) {
   const map = {
     'Новый': 'new',
+    'Скрининг': 'screening',
     'На рассмотрении': 'review',
     'Собеседование': 'interview',
     'Отказ': 'rejected',
@@ -1173,6 +1299,22 @@ function openModal(index) {
   }
   questions.innerHTML = qHTML;
 
+  // Interview link & comment
+  const extras = getAppExtras(app);
+  const interviewInput = document.getElementById('modalInterviewLink');
+  const interviewOpen = document.getElementById('modalInterviewOpen');
+  interviewInput.value = extras.interviewLink || '';
+  if (extras.interviewLink) {
+    interviewOpen.href = extras.interviewLink;
+    interviewOpen.style.display = '';
+  } else {
+    interviewOpen.style.display = 'none';
+  }
+  document.getElementById('interviewSavedHint').classList.remove('visible');
+
+  document.getElementById('modalComment').value = extras.comment || '';
+  document.getElementById('commentSavedHint').classList.remove('visible');
+
   // Meta
   document.getElementById('modalDate').textContent = app['Дата'] || '';
 
@@ -1222,6 +1364,35 @@ document.querySelectorAll('#statusSelector .status-option').forEach(opt => {
     // Re-render table, cards and stats
     renderAll();
   });
+});
+
+/* ======================== INTERVIEW LINK & COMMENT ======================== */
+function showSavedHint(id) {
+  const hint = document.getElementById(id);
+  hint.classList.add('visible');
+  setTimeout(() => hint.classList.remove('visible'), 1500);
+}
+
+document.getElementById('modalInterviewLink').addEventListener('change', () => {
+  if (currentModalIndex < 0) return;
+  const app = allApplications[currentModalIndex];
+  const val = document.getElementById('modalInterviewLink').value.trim();
+  setAppExtra(app, 'interviewLink', val);
+  const openBtn = document.getElementById('modalInterviewOpen');
+  if (val) {
+    openBtn.href = val;
+    openBtn.style.display = '';
+  } else {
+    openBtn.style.display = 'none';
+  }
+  showSavedHint('interviewSavedHint');
+});
+
+document.getElementById('modalComment').addEventListener('change', () => {
+  if (currentModalIndex < 0) return;
+  const app = allApplications[currentModalIndex];
+  setAppExtra(app, 'comment', document.getElementById('modalComment').value);
+  showSavedHint('commentSavedHint');
 });
 
 /* ======================== FILTERS ======================== */
