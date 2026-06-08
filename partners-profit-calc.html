@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>TAPE — калькулятор распределения прибыли по кварталам</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; max-width: 1200px; margin: 1.5em auto; padding: 0 1.5em; color: #1a1a1a; line-height: 1.5; }
+  h1 { font-size: 1.6em; margin-bottom: 0.2em; }
+  h2 { font-size: 1.15em; margin-top: 1.6em; padding-bottom: 0.3em; border-bottom: 1px solid #ddd; }
+  h3 { font-size: 1.02em; margin: 1em 0 0.4em; }
+  .intro { color: #555; margin-bottom: 1.2em; }
+  .note { color: #666; font-size: 0.88em; }
+  .small { font-size: 0.88em; color: #777; }
+
+  /* Lead bonus block */
+  .lead-info { background: #fff4e6; border-left: 4px solid #f0a040; padding: 0.7em 1em; margin: 1em 0; border-radius: 4px; font-size: 0.93em; }
+  .lead-info b { color: #8b4513; }
+
+  /* Direction cards for % editing */
+  .dir-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .dir-card { background: #f7f8fa; padding: 0.8em 1em; border-radius: 6px; border: 1px solid #e3e7ec; }
+  .dir-card.production { border-left: 4px solid #3b82f6; }
+  .dir-card.media { border-left: 4px solid #10b981; }
+  .dir-card.artefact { border-left: 4px solid #8b5cf6; }
+  .dir-card h3 { margin-top: 0; }
+  .pct-row { display: flex; justify-content: space-between; align-items: center; margin: 4px 0; font-size: 0.93em; }
+  .pct-row label { flex: 1; }
+  .pct-row input[type=number] { width: 60px; padding: 3px 6px; border: 1px solid #ccc; border-radius: 3px; text-align: right; font-size: 0.93em; }
+  .pct-row .unit { color: #777; margin-left: 4px; }
+  .pct-row.calc { font-weight: 600; color: #0f4c81; background: #eef5fb; padding: 4px 6px; border-radius: 3px; margin-top: 6px; }
+
+  /* Profit input table */
+  .profit-table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
+  .profit-table th, .profit-table td { border: 1px solid #ccc; padding: 6px 8px; }
+  .profit-table th { background: #e8eef4; font-weight: 600; }
+  .profit-table input[type=number] { width: 100%; box-sizing: border-box; padding: 4px 6px; border: none; background: #fff8dc; text-align: right; font-variant-numeric: tabular-nums; }
+  .profit-table input[type=number]:focus { background: #fffbeb; outline: 2px solid #f0c040; }
+  .profit-table tr.dir-prod td:first-child { border-left: 4px solid #3b82f6; }
+  .profit-table tr.dir-media td:first-child { border-left: 4px solid #10b981; }
+  .profit-table tr.dir-art td:first-child { border-left: 4px solid #8b5cf6; }
+  .profit-table td.totals { background: #f3f6fa; font-weight: 600; color: #0f4c81; text-align: right; font-variant-numeric: tabular-nums; }
+  .profit-table tr.total-row td { background: #fff8e1; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+  .profit-table tr.total-row td:first-child { text-align: left; }
+
+  /* Output table */
+  .out-table { border-collapse: collapse; width: 100%; margin: 0.5em 0; }
+  .out-table th, .out-table td { border: 1px solid #ccc; padding: 7px 10px; font-size: 0.95em; }
+  .out-table th { background: #e8eef4; font-weight: 600; }
+  .out-table td.num, .out-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  .out-table tr.partner-row td { font-weight: 600; }
+  .out-table tr.partner-row td.num { color: #0f4c81; }
+  .out-table tr.partner-row td:last-child { background: #e7f3ff; color: #0f4c81; font-weight: 700; }
+  .out-table tr.subrow td { color: #777; font-size: 0.88em; font-weight: 400; }
+  .out-table tr.subrow td:first-child { padding-left: 28px; }
+  .out-table tr.total-row td { background: #fff8e1; font-weight: 700; }
+
+  .reset-btn { margin-left: 8px; padding: 3px 10px; font-size: 0.85em; border: 1px solid #ccc; background: #fff; border-radius: 4px; cursor: pointer; }
+  .reset-btn:hover { background: #f0f0f0; }
+</style>
+</head>
+<body>
+
+<h1>TAPE — калькулятор распределения чистой прибыли по кварталам</h1>
+<p class="intro">
+Распределение чистой прибыли направлений между партнёрами и руководителем направления (Артефакт). Поквартально + годовой итог.
+По умолчанию загружен <b>план 2026</b> (можно менять). Калькулятор пересчитывает в реальном времени; введённые значения сохраняются локально в браузере.
+</p>
+
+<div class="lead-info">
+<b>Про лид-бонус (вне этого калькулятора).</b> Партнёр, который привёл конкретную сделку, получает <b>10% от прибыли этой сделки</b> как дополнительную мотивацию <i>сверх</i> распределения ниже. Бонус выплачивается из сделки, а не из общего пула — поэтому в этом расчёте не отображается. Учёт лидов идёт через CRM (партнёр-источник).
+</div>
+
+<h2>1. Параметры распределения (% от чистой прибыли направления)</h2>
+<p class="small">Жёлтые поля — настраиваются. Серое — рассчитывается автоматически (остаток делится ⅓ на каждого партнёра как дивиденды).</p>
+
+<div class="dir-grid">
+  <div class="dir-card production">
+    <h3>Продакшен <span class="small">(руководитель — Аня)</span></h3>
+    <div class="pct-row"><label>Аня (руководитель)</label><input type="number" id="prod_anya" value="25" min="0" max="100" step="1" oninput="recalc()"><span class="unit">%</span></div>
+    <div class="pct-row"><label>Саша (CEO)</label><input type="number" id="prod_sasha" value="15" min="0" max="100" step="1" oninput="recalc()"><span class="unit">%</span></div>
+    <div class="pct-row calc"><label>Остаток на дивиденды (⅓ × 3)</label><span id="prod_remain">60</span><span class="unit">%</span></div>
+  </div>
+
+  <div class="dir-card media">
+    <h3>Медиа <span class="small">(руководитель — Паша)</span></h3>
+    <div class="pct-row"><label>Паша (руководитель)</label><input type="number" id="media_pasha" value="25" min="0" max="100" step="1" oninput="recalc()"><span class="unit">%</span></div>
+    <div class="pct-row"><label>Саша (CEO)</label><input type="number" id="media_sasha" value="15" min="0" max="100" step="1" oninput="recalc()"><span class="unit">%</span></div>
+    <div class="pct-row calc"><label>Остаток на дивиденды (⅓ × 3)</label><span id="media_remain">60</span><span class="unit">%</span></div>
+  </div>
+
+  <div class="dir-card artefact">
+    <h3>Артефакт <span class="small">(руководитель — Лялин)</span></h3>
+    <div class="pct-row"><label>Лялин (руководитель)</label><input type="number" id="art_lyalin" value="10" min="0" max="100" step="1" oninput="recalc()"><span class="unit">%</span></div>
+    <div class="pct-row"><label>Саша (CEO)</label><input type="number" id="art_sasha" value="15" min="0" max="100" step="1" oninput="recalc()"><span class="unit">%</span></div>
+    <div class="pct-row"><label>Паша (эксперт)</label><input type="number" id="art_pasha" value="15" min="0" max="100" step="1" oninput="recalc()"><span class="unit">%</span></div>
+    <div class="pct-row calc"><label>Остаток на дивиденды (⅓ × 3)</label><span id="art_remain">60</span><span class="unit">%</span></div>
+  </div>
+</div>
+
+<h2>2. Чистая прибыль направлений по кварталам, ₽
+  <button class="reset-btn" onclick="resetProfits()">сбросить</button>
+</h2>
+
+<table class="profit-table">
+  <thead>
+    <tr><th>Направление</th><th>Q1</th><th>Q2</th><th>Q3</th><th>Q4</th><th>Год</th></tr>
+  </thead>
+  <tbody>
+    <tr class="dir-prod">
+      <td>Продакшен</td>
+      <td><input type="number" id="prod_q1" value="-2997558" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="prod_q2" value="2000000" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="prod_q3" value="5000000" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="prod_q4" value="5000000" step="100000" oninput="recalc()"></td>
+      <td class="totals" id="prod_year">0</td>
+    </tr>
+    <tr class="dir-media">
+      <td>Медиа</td>
+      <td><input type="number" id="media_q1" value="-1781621" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="media_q2" value="3000000" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="media_q3" value="5000000" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="media_q4" value="5000000" step="100000" oninput="recalc()"></td>
+      <td class="totals" id="media_year">0</td>
+    </tr>
+    <tr class="dir-art">
+      <td>Артефакт</td>
+      <td><input type="number" id="art_q1" value="-923326" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="art_q2" value="1000000" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="art_q3" value="3000000" step="100000" oninput="recalc()"></td>
+      <td><input type="number" id="art_q4" value="3000000" step="100000" oninput="recalc()"></td>
+      <td class="totals" id="art_year">0</td>
+    </tr>
+    <tr class="total-row">
+      <td>Итого прибыль компании</td>
+      <td id="t_q1">0</td>
+      <td id="t_q2">0</td>
+      <td id="t_q3">0</td>
+      <td id="t_q4">0</td>
+      <td id="t_year">0</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>3. Выплаты по партнёрам, ₽</h2>
+<table class="out-table" id="out-tbl">
+  <thead>
+    <tr><th>Получатель</th><th class="num">Q1</th><th class="num">Q2</th><th class="num">Q3</th><th class="num">Q4</th><th class="num">Год</th></tr>
+  </thead>
+  <tbody id="out-body"></tbody>
+</table>
+
+<p class="note">
+  «За роль» = доли руководителя/CEO/эксперта по направлениям, заданные в блоке 1. «Дивиденды» = ⅓ от остатка каждого направления.
+  Лялин — наёмный сотрудник, не партнёр: получает только долю «за роль», не участвует в дивидендах.
+</p>
+
+<h2>4. Допущения</h2>
+<ul class="note">
+  <li>«Чистая прибыль направления» — операционная прибыль после всех расходов (зарплаты команды, бэк-офис, доля общих).</li>
+  <li>Все цифры — до налога на дивиденды (НДФЛ 13/15%) и до решения партнёров о реинвесте: ⅓-доля может частично оставаться в компании.</li>
+  <li>Если сумма % «за роль» в направлении ≥ 100% — остаток на дивиденды будет 0 или отрицательным, калькулятор покажет ошибку.</li>
+</ul>
+
+<script>
+const STORAGE_KEY = 'tape_calc_v3_2026plan';
+
+function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+function fmt(n) { return n.toLocaleString('ru-RU', {maximumFractionDigits: 0}); }
+function pctText(n) { return n.toFixed(1) + '%'; }
+
+const QUARTERS = ['q1','q2','q3','q4'];
+const DIRS = ['prod','media','art'];
+
+function saveState() {
+  const state = {};
+  ['prod_anya','prod_sasha','media_pasha','media_sasha','art_lyalin','art_sasha','art_pasha'].forEach(k => state[k] = num(k));
+  DIRS.forEach(d => QUARTERS.forEach(q => state[`${d}_${q}`] = num(`${d}_${q}`)));
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {}
+}
+
+function loadState() {
+  try {
+    const s = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+    Object.entries(s).forEach(([k, v]) => {
+      const el = document.getElementById(k);
+      if (el) el.value = v;
+    });
+  } catch(e) {}
+}
+
+function resetProfits() {
+  DIRS.forEach(d => QUARTERS.forEach(q => document.getElementById(`${d}_${q}`).value = 0));
+  recalc();
+}
+
+function recalc() {
+  // === % roles ===
+  const prodAnya = num('prod_anya') / 100;
+  const prodSasha = num('prod_sasha') / 100;
+  const prodRemain = Math.max(0, 1 - prodAnya - prodSasha);
+  document.getElementById('prod_remain').textContent = (prodRemain * 100).toFixed(0);
+
+  const mediaPasha = num('media_pasha') / 100;
+  const mediaSasha = num('media_sasha') / 100;
+  const mediaRemain = Math.max(0, 1 - mediaPasha - mediaSasha);
+  document.getElementById('media_remain').textContent = (mediaRemain * 100).toFixed(0);
+
+  const artLyalin = num('art_lyalin') / 100;
+  const artSasha = num('art_sasha') / 100;
+  const artPasha = num('art_pasha') / 100;
+  const artRemain = Math.max(0, 1 - artLyalin - artSasha - artPasha);
+  document.getElementById('art_remain').textContent = (artRemain * 100).toFixed(0);
+
+  // Аккумуляторы выплат: payouts[partner][q] = sum, payouts[partner].role[q], payouts[partner].div[q]
+  const partners = {
+    'Саша (CEO)':      { role: {}, div: {}, total: {} },
+    'Аня':             { role: {}, div: {}, total: {} },
+    'Паша':            { role: {}, div: {}, total: {} },
+    'Лялин':           { role: {}, div: {}, total: {} },
+  };
+  // init zeros
+  Object.values(partners).forEach(p => QUARTERS.forEach(q => { p.role[q] = 0; p.div[q] = 0; p.total[q] = 0; }));
+
+  // === Поквартальный расчёт ===
+  QUARTERS.forEach(q => {
+    const pProd = num(`prod_${q}`);
+    const pMedia = num(`media_${q}`);
+    const pArt = num(`art_${q}`);
+
+    // PROD: Аня роль + Саша CEO + остаток/3
+    const prodAnyaRole = pProd * prodAnya;
+    const prodSashaRole = pProd * prodSasha;
+    const prodDiv = pProd * prodRemain / 3;
+    partners['Аня'].role[q] += prodAnyaRole;
+    partners['Саша (CEO)'].role[q] += prodSashaRole;
+    partners['Саша (CEO)'].div[q] += prodDiv;
+    partners['Аня'].div[q] += prodDiv;
+    partners['Паша'].div[q] += prodDiv;
+
+    // MEDIA: Паша роль + Саша CEO + остаток/3
+    const mediaPashaRole = pMedia * mediaPasha;
+    const mediaSashaRole = pMedia * mediaSasha;
+    const mediaDiv = pMedia * mediaRemain / 3;
+    partners['Паша'].role[q] += mediaPashaRole;
+    partners['Саша (CEO)'].role[q] += mediaSashaRole;
+    partners['Саша (CEO)'].div[q] += mediaDiv;
+    partners['Аня'].div[q] += mediaDiv;
+    partners['Паша'].div[q] += mediaDiv;
+
+    // ART: Лялин роль + Саша CEO + Паша эксперт + остаток/3
+    const artLyalinRole = pArt * artLyalin;
+    const artSashaRole = pArt * artSasha;
+    const artPashaRole = pArt * artPasha;
+    const artDiv = pArt * artRemain / 3;
+    partners['Лялин'].role[q] += artLyalinRole;
+    partners['Саша (CEO)'].role[q] += artSashaRole;
+    partners['Паша'].role[q] += artPashaRole;
+    partners['Саша (CEO)'].div[q] += artDiv;
+    partners['Аня'].div[q] += artDiv;
+    partners['Паша'].div[q] += artDiv;
+  });
+
+  // Totals per partner per quarter
+  Object.values(partners).forEach(p => {
+    QUARTERS.forEach(q => p.total[q] = p.role[q] + p.div[q]);
+  });
+
+  // === Render profit table totals ===
+  DIRS.forEach(d => {
+    const sum = QUARTERS.reduce((s, q) => s + num(`${d}_${q}`), 0);
+    document.getElementById(`${d}_year`).textContent = fmt(sum);
+  });
+  QUARTERS.forEach(q => {
+    const sum = DIRS.reduce((s, d) => s + num(`${d}_${q}`), 0);
+    document.getElementById(`t_${q}`).textContent = fmt(sum);
+  });
+  const grandTotal = QUARTERS.reduce((s, q) => s + DIRS.reduce((s2, d) => s2 + num(`${d}_${q}`), 0), 0);
+  document.getElementById('t_year').textContent = fmt(grandTotal);
+
+  // === Render payouts table ===
+  let body = '';
+  Object.entries(partners).forEach(([name, p]) => {
+    const yearRole = QUARTERS.reduce((s, q) => s + p.role[q], 0);
+    const yearDiv = QUARTERS.reduce((s, q) => s + p.div[q], 0);
+    const yearTotal = yearRole + yearDiv;
+    const pctYear = grandTotal ? (yearTotal / grandTotal * 100).toFixed(1) + '%' : '—';
+
+    body += `<tr class="partner-row"><td>${name}</td>`;
+    QUARTERS.forEach(q => body += `<td class="num">${fmt(p.total[q])}</td>`);
+    body += `<td class="num">${fmt(yearTotal)} <span class="small">(${pctYear})</span></td></tr>`;
+
+    body += `<tr class="subrow"><td>· «За роль»</td>`;
+    QUARTERS.forEach(q => body += `<td class="num">${fmt(p.role[q])}</td>`);
+    body += `<td class="num">${fmt(yearRole)}</td></tr>`;
+
+    body += `<tr class="subrow"><td>· Дивиденды ⅓</td>`;
+    QUARTERS.forEach(q => body += `<td class="num">${fmt(p.div[q])}</td>`);
+    body += `<td class="num">${fmt(yearDiv)}</td></tr>`;
+  });
+
+  // Total row
+  const qTotals = QUARTERS.map(q => Object.values(partners).reduce((s, p) => s + p.total[q], 0));
+  body += `<tr class="total-row"><td>ИТОГО выплат</td>`;
+  qTotals.forEach(t => body += `<td class="num">${fmt(t)}</td>`);
+  body += `<td class="num">${fmt(qTotals.reduce((s, t) => s + t, 0))}</td></tr>`;
+
+  document.getElementById('out-body').innerHTML = body;
+
+  saveState();
+}
+
+loadState();
+recalc();
+</script>
+
+</body>
+</html>
